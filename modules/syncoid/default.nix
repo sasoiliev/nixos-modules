@@ -130,7 +130,7 @@ in
           description = "ZFS snapshot syncronization tool - ${dataset.source} -> ${dataset.target}";
           serviceConfig = let
             options = concatStringsSep " " (filter (x: x != "") [
-              (optionalString (dataset.sshKey != null) "-i ${dataset.sshKey}")
+              (optionalString (dataset.sshKey != null) "--sshkey=${dataset.sshKey}")
               (optionalString dataset.recursive "--recursive")
               (optionalString dataset.skipParent "--skip-parent")
               dataset.extraOptions
