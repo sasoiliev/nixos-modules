@@ -99,6 +99,18 @@ in
             default = false;
             description = "Whether to sync the parent dataset. Only meaningful if `recursive` is set to `true`.";
           };
+
+          noSyncSnapshot = mkOption {
+            type = bool;
+            default = false;
+            description = "Whether to create a new snapshot or just to sync the existing ones (i.e. `--no-sync-snap` option of syncoid).";
+          };
+
+          createBookmark = mkOption {
+            type = bool;
+            default = false;
+            description = "Whether to create a ZFS bookmark on the source. Only works if `noSyncSnapshot == true`.";
+          };
         };
       });
     };
@@ -133,6 +145,8 @@ in
               (optionalString (dataset.sshKey != null) "--sshkey=${dataset.sshKey}")
               (optionalString dataset.recursive "--recursive")
               (optionalString dataset.skipParent "--skip-parent")
+              (optionalString dataset.noSyncSnapshot "--no-sync-snap")
+              (optionalString (dataset.noSyncSnapshot && dataset.createBookmark) "--create-bookmark")
               dataset.extraOptions
             ]);
           in {

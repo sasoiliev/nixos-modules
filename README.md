@@ -105,14 +105,16 @@ The supported options are:
 
 A dataset accepts the following options:
 
-| Option         | Description                                 | Type         | Default Value |
-| :------------- | :------------------------------------------ | :----------- | :------------ |
-| `source`       | The source dataset to sync from             | `str`        |               |
-| `target`       | The target dataset to sync to               | `str`        |               |
-| `sshKey`       | The SSH private key to use for this dataset | `nullOr str` | `null`        |
-| `extraOptions` | Extra `syncoid` options to pass verbatim    | `str`        | `""`          |
-| `recursive`    | Whether to sync child datasets              | `bool`       | `false`       |
-| `skipParent`   | Whether to sync parent dataset              | `bool`       | `false`       |
+| Option           | Description                                 | Type         | Default Value |
+| :--------------- | :------------------------------------------ | :----------- | :------------ |
+| `source`         | The source dataset to sync from             | `str`        |               |
+| `target`         | The target dataset to sync to               | `str`        |               |
+| `sshKey`         | The SSH private key to use for this dataset | `nullOr str` | `null`        |
+| `extraOptions`   | Extra `syncoid` options to pass verbatim    | `str`        | `""`          |
+| `recursive`      | Whether to sync child datasets              | `bool`       | `false`       |
+| `skipParent`     | Whether to sync parent dataset              | `bool`       | `false`       |
+| `noSyncSnapshot` | Whether to create a sync snapshot           | `bool`       | `false`       |
+| `createBookmark` | Whether to create a ZFS bookmark            | `bool`       | `false`       |
 
 #### Usage
 
