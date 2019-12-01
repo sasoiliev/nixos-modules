@@ -1,8 +1,8 @@
 diff --git a/sanoid b/sanoid
-index ddd457f..d5d2a95 100755
+index 2b566ef..363e319 100755
 --- a/sanoid
 +++ b/sanoid
-@@ -18,7 +18,7 @@ use Time::Local;      # to parse dates in reverse
+@@ -19,7 +19,7 @@ use Capture::Tiny ':all';
  
  my %args = ("configdir" => "/etc/sanoid");
  GetOptions(\%args, "verbose", "debug", "cron", "readonly", "quiet",
@@ -11,7 +11,7 @@ index ddd457f..d5d2a95 100755
                     "monitor-snapshots", "take-snapshots", "prune-snapshots", "force-prune",
                     "monitor-capacity"
            ) or pod2usage(2);
-@@ -34,8 +34,14 @@ my $pscmd = '/bin/ps';
+@@ -35,8 +35,15 @@ my $pscmd = '/bin/ps';
  my $zfs = '/sbin/zfs';
  my $zpool = '/sbin/zpool';
  
@@ -21,13 +21,14 @@ index ddd457f..d5d2a95 100755
 +} else {
 +  $defaults_conf_dir = "$args{'configdir'}";
 +}
++
  my $conf_file = "$args{'configdir'}/sanoid.conf";
 -my $default_conf_file = "$args{'configdir'}/sanoid.defaults.conf";
 +my $default_conf_file = "$defaults_conf_dir/sanoid.defaults.conf";
  
  # parse config file
  my %config = init($conf_file,$default_conf_file);
-@@ -1526,6 +1532,8 @@ Assumes --cron --verbose if no other arguments (other than configdir) are specif
+@@ -1659,6 +1666,8 @@ Assumes --cron --verbose if no other arguments (other than configdir) are specif
  Options:
  
    --configdir=DIR       Specify a directory to find config file sanoid.conf

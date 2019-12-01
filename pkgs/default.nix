@@ -6,7 +6,7 @@ let
   callPackage = pkgs.lib.callPackageWith (pkgs // pkgs.xlibs // self);
 
   self = {
-    sanoid = callPackage ./sanoid { }; 
+    sanoid = callPackage ./sanoid { makeWrapper = pkgs.makeWrapper; }; 
   };
 in
 self
