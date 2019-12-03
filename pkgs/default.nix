@@ -7,6 +7,7 @@ let
 
   self = {
     sanoid = callPackage ./sanoid { makeWrapper = pkgs.makeWrapper; }; 
+    zpool-influxdb = callPackage ./zpool-influxdb { };
   };
 in
 self
