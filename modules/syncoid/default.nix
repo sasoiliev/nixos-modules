@@ -21,7 +21,7 @@ let
   /* Create a schedule option with a default value and a description.
    */
   mkScheduleOption = default: description: mkOption {
-    type = types.str;
+    type = types.nullOr types.str;
     default = default;
     description = description;
   };
@@ -43,11 +43,12 @@ in
       '';
     };
 
-    defaultSchedule = mkScheduleOption "hourly" ''
-      A calendar event specifying the schedule to run sanoid in cron mode.
+    defaultSchedule = mkScheduleOption null ''
+      A calendar event specifying the schedule to run sanoid in cron mode
+      or <literal>null</literal> to disable periodic sync.
 
-      The syntax of this option follows the Calendar Events section from 
-      https://www.freedesktop.org/software/systemd/man/systemd.time.html.
+      The syntax of this option follows the Calendar Events section from
+      https://www.freedesktop.org/software/systemd/man/systemd.time.html
 
       This schedule will be used for all datasets that don't have an
       explicitly specified `schedule` option.
@@ -76,9 +77,10 @@ in
           sshKey = mkSskKeyOption cfg.defaultSshKey "The path to the SSH private key file to use to connect.";
 
           schedule = mkScheduleOption cfg.defaultSchedule ''
-            A calendar event specifying the schedule to run sanoid in cron mode.
+            A calendar event specifying the schedule to run sanoid in cron mode
+            or <literal>null</literal> to disable periodic sync.
 
-            The syntax of this option follows the Calendar Events section from 
+            The syntax of this option follows the Calendar Events section from
             https://www.freedesktop.org/software/systemd/man/systemd.time.html.
           '';
 
@@ -131,7 +133,7 @@ in
        The `mkUnitFunction` is a function that accepts a dataset and returns a
        systemd service/timer attribute set.
      */
-    mkSystemdSet = mkUnitFunction: listToAttrs (map mkUnitFunction cfg.datasets);
+    mkSystemdSet = datasets: mkUnitFunction: listToAttrs (map mkUnitFunction datasets);
   in mkIf cfg.enable {
     environment.systemPackages = [ sanoid ];
 
@@ -155,7 +157,7 @@ in
           };
         };
       };
-    in mkSystemdSet mkDatasetSyncService;
+    in mkSystemdSet cfg.datasets mkDatasetSyncService;
 
     systemd.timers = let
       mkDatasetSyncTimer = dataset: {
@@ -169,6 +171,6 @@ in
           };
         };
       };
-    in mkSystemdSet mkDatasetSyncTimer;
+    in mkSystemdSet (builtins.filter (d: d.schedule != null) cfg.datasets) mkDatasetSyncTimer;
   };
 }

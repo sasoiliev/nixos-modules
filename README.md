@@ -98,9 +98,7 @@ The supported options are:
 | `enable`          | Whether to enable the Syncoid module            | `bool`           | `false`       |
 | `defaultSshKey`   | The default SSH private key to use when syncing | `nullOr str`     | `null`        |
 |                   | via SSH                                         |                  |               |
-| `defaultSchedule` | The schedule to use for datasets with no        | `nullOr str`     | `null`        |
-|                   | `schedule`                                      |                  |               |
-|                   | option set                                      |                  |               |
+| `defaultSchedule` | The schedule to use for datasets with no `schedule` option set | `nullOr str`     | `null`        |
 | `datasets`        | A list of `dataset` objects (see below)         | `listOf dataset` | `[]`          |
 
 A dataset accepts the following options:
@@ -110,6 +108,7 @@ A dataset accepts the following options:
 | `source`         | The source dataset to sync from             | `str`        |               |
 | `target`         | The target dataset to sync to               | `str`        |               |
 | `sshKey`         | The SSH private key to use for this dataset | `nullOr str` | `null`        |
+| `schedule`       | The schedule to use for this dataset        | `nullOr str` | `null`        |
 | `extraOptions`   | Extra `syncoid` options to pass verbatim    | `str`        | `""`          |
 | `recursive`      | Whether to sync child datasets              | `bool`       | `false`       |
 | `skipParent`     | Whether to sync parent dataset              | `bool`       | `false`       |
