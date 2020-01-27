@@ -96,9 +96,8 @@ The supported options are:
 | Option            | Description                                     | Type             | Default Value |
 | :---------------- | :---------------------------------------------- | :--------------- | :------------ |
 | `enable`          | Whether to enable the Syncoid module            | `bool`           | `false`       |
-| `defaultSshKey`   | The default SSH private key to use when syncing | `nullOr str`     | `null`        |
-|                   | via SSH                                         |                  |               |
-| `defaultSchedule` | The schedule to use for datasets with no `schedule` option set | `nullOr str`     | `null`        |
+| `defaultSshKey`   | The default SSH private key to use when syncing via SSH | `nullOr str` | `null`    |
+| `defaultSchedule` | The schedule to use for datasets with no `schedule` option set | `nullOr str` | `null` |
 | `datasets`        | A list of `dataset` objects (see below)         | `listOf dataset` | `[]`          |
 
 A dataset accepts the following options:
