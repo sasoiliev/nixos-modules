@@ -23,12 +23,12 @@ let
   mkPerlInclude = perlModule: "-I${perlPackages."${perlModule}"}/${perl.libPrefix}";
 in stdenv.mkDerivation rec {
   name = "sanoid-${version}";
-  version = "2.0.3";
+  version = "";
 
   src = fetchgit {
-    url = "https://github.com/jimsalterjrs/sanoid";
-    rev = "refs/tags/v${version}";
-    sha256 = "1wmymzqg503nmhw8hrblfs67is1l3ljbk2fjvrqwyb01b7mbn80x";
+    url = "https://github.com/sasoiliev/sanoid";
+    rev = "d32556ca90baaf7f549bd9831964af1c33f90131";
+    sha256 = "0if9nm97k1lr9hh9rbrb25ji1cq72dxqnvlcmli3wdypvi9i6d35";
   };
 
   phases = "unpackPhase installPhase fixupPhase";
