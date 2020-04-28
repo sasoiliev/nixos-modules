@@ -3,7 +3,7 @@
 with lib;
 
 let
-  inherit (builtins) replaceStrings listToAttrs filter;
+  inherit (builtins) replaceStrings listToAttrs filter foldl' hasAttr;
   inherit (strings) concatStringsSep;
 
   cfg = config.programs.syncoid;
@@ -74,6 +74,30 @@ in
             description = "The target dataset to sync to.";
           };
 
+          unitName = mkOption {
+            type = nullOr str;
+            default = null;
+            description = ''
+              The systemd service unit name.
+
+              `"<source>--<target>"` will be used if left `null`, where
+              `<source>` and `<target>` will equal to the respective option
+              values with "@" replaced with "-at-" and "/" and ":" replaced
+              with "-".
+            '';
+          };
+
+          systemdTarget = mkOption {
+            type = nullOr str;
+            default = null;
+            description = ''
+              A systemd target name to include the service in.
+
+              This allows for grouping datasets together in a target that can
+              be then invoked with a single command.
+            '';
+          };
+
           sshKey = mkSskKeyOption cfg.defaultSshKey "The path to the SSH private key file to use to connect.";
 
           schedule = mkScheduleOption cfg.defaultSchedule ''
@@ -121,12 +145,12 @@ in
   ###### implementation
 
   config = let
-    /* Construct a valid systemd unit name from a syncoid dataset path.
+    /* Escapes a syncoid dataset path.
+
        The path may point to a remote system (i.e. `user@host:path`) and will
        most probably contain slashes.
      */
-    mkSystemdName = datasetPath: "syncoid-" + (
-      replaceStrings ["@" ":" "/"] ["-at-" "--" "-"] datasetPath);
+    escapePath = datasetPath: replaceStrings ["@" ":" "/"] ["-at-" "-" "-"] datasetPath;
 
     /* Build an attribute set to be set to `systemd.services` or `systemd.timers`.
 
@@ -134,12 +158,18 @@ in
        systemd service/timer attribute set.
      */
     mkSystemdSet = datasets: mkUnitFunction: listToAttrs (map mkUnitFunction datasets);
+
+    unitName = dataset: "syncoid-" + (
+      if dataset.unitName != null
+        then dataset.unitName
+        else "${escapePath dataset.source}--${escapePath dataset.target}"
+    );
   in mkIf cfg.enable {
     environment.systemPackages = [ sanoid ];
 
     systemd.services = let
       mkDatasetSyncService = dataset: {
-        name = "${mkSystemdName dataset.source}";
+        name = unitName dataset;
         value = {
           description = "ZFS snapshot syncronization tool - ${dataset.source} -> ${dataset.target}";
           serviceConfig = let
@@ -161,16 +191,28 @@ in
 
     systemd.timers = let
       mkDatasetSyncTimer = dataset: {
-        name = "${mkSystemdName dataset.source}";
+        name = unitName dataset;
         value = {
           description = "ZFS snapshot syncronization tool - ${dataset.source} -> ${dataset.target} (timer)";
           wantedBy = [ "timers.target" ];
           timerConfig = {
             OnCalendar = dataset.schedule;
-            Unit = "${mkSystemdName dataset.source}.service";
+            Unit = "${unitName dataset}.service";
           };
         };
       };
-    in mkSystemdSet (builtins.filter (d: d.schedule != null) cfg.datasets) mkDatasetSyncTimer;
+    in mkSystemdSet (filter (d: d.schedule != null) cfg.datasets) mkDatasetSyncTimer;
+
+    systemd.targets = let
+      mkSyncTargets = datasets: let
+        datasetUnit = x: "${unitName x}.service";
+        addDataset = xs: x: let
+          unitSingleton = [ (datasetUnit x) ];
+          targetUnits = if (hasAttr x.systemdTarget xs)
+            then xs."${x.systemdTarget}".wants ++ unitSingleton
+            else unitSingleton;
+        in xs // { "${x.systemdTarget}".wants = targetUnits; };
+      in foldl' addDataset {} datasets;
+    in mkSyncTargets (filter (x: x.systemdTarget != null) cfg.datasets);
   };
 }
