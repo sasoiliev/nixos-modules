@@ -31,9 +31,7 @@ in stdenv.mkDerivation rec {
     sha256 = "1wmymzqg503nmhw8hrblfs67is1l3ljbk2fjvrqwyb01b7mbn80x";
   };
 
-  phases = "unpackPhase patchPhase installPhase fixupPhase";
-
-  patches = [ ./01-sanoid.patch ];
+  phases = "unpackPhase installPhase fixupPhase";
 
   buildInputs = [ makeWrapper ];
 
