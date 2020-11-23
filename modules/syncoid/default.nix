@@ -108,6 +108,15 @@ in
             https://www.freedesktop.org/software/systemd/man/systemd.time.html.
           '';
 
+          waitFor = mkOption {
+            type = types.listOf types.str;
+            default = [];
+            description = ''
+              A list of systemd services to wait for before launching this
+              service.
+            '';
+          };
+
           extraOptions = mkOption {
             type = str;
             default = "";
@@ -187,6 +196,8 @@ in
         name = unitName dataset;
         value = {
           description = "ZFS snapshot syncronization tool - ${dataset.source} -> ${dataset.target}";
+          after = dataset.waitFor;
+          requires = dataset.waitFor;
           serviceConfig = let
             options = concatStringsSep " " (filter (x: x != "") [
               (optionalString (dataset.sshKey != null) "--sshkey=${dataset.sshKey}")
