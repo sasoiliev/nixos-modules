@@ -137,6 +137,21 @@ in
             default = false;
             description = "Whether to create a ZFS bookmark on the source. Only works if `noSyncSnapshot == true`.";
           };
+
+          restartOnFailure = mkOption {
+            type = bool;
+            default = false;
+            description = "Whether to restart the service on failure.";
+          };
+
+          restartSec = mkOption {
+            type = int;
+            default = 30;
+            description = ''
+              How long to wait (in seconds) before restarting a failed service run.
+              Only applicable if `restartOnFailure == true`.
+            '';
+          };
         };
       });
     };
@@ -184,7 +199,10 @@ in
           in {
             ExecStart = "${sanoid}/bin/syncoid ${options} ${dataset.source} ${dataset.target}";
             Type = "oneshot";
-          };
+          } // (optionalAttrs dataset.restartOnFailure
+          { Restart = "on-failure";
+            RestartSec = dataset.restartSec;
+          });
         };
       };
     in mkSystemdSet cfg.datasets mkDatasetSyncService;
