@@ -59,9 +59,9 @@ in stdenv.mkDerivation rec {
   meta = {
     inherit version;
     description = ''Policy-driven ZFS snapshot management and replication tools.'';
-    license = stdenv.lib.licenses.gpl3;
+    license = lib.licenses.gpl3;
     maintainers = [];
-    platforms = stdenv.lib.platforms.linux;
+    platforms = lib.platforms.linux;
     homepage = https://github.com/jimsalterjrs/sanoid;
   };
 }
