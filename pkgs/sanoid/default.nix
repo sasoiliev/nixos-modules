@@ -40,11 +40,13 @@ in stdenv.mkDerivation rec {
     find . -maxdepth 1 -type f -exec cp {} $out \;
     mv $out/sanoid.conf $out/sanoid.conf.example
     mkdir -p $out/bin
-    for file in syncoid sanoid findoid; do
-      mv $out/$file $out/bin/$file.pl
-      substituteInPlace $out/bin/$file.pl \
+    # Workaround for an issue introduced by https://github.com/NixOS/nixpkgs/pull/179603 -
+    # the file variable is clobbered in substituteInPlace.
+    for _file in syncoid sanoid findoid; do
+      mv $out/$_file $out/bin/$_file.pl
+      substituteInPlace $out/bin/$_file.pl \
         --replace "#!/usr/bin/perl" "#!${perl}/bin/perl ${builtins.concatStringsSep " " (map mkPerlInclude [ "ConfigIniFiles" "CaptureTiny" ])}"
-      makeWrapper $out/bin/$file.pl $out/bin/$file --prefix PATH : ${lib.makeBinPath [
+      makeWrapper $out/bin/$_file.pl $out/bin/$_file --prefix PATH : ${lib.makeBinPath [
         lzop xz gzip zstd pigz lz4 # compression tools
         openssh
         pv mbuffer sudo zfs procps coreutils
